@@ -45,7 +45,7 @@ public class ScreenshotHelperWindow : EditorWindow
     private EPrefixSuffixFormat m_currentSuffixFormat;
     private int m_selectedSeparator;
     private string m_currentSeparator;
-    private ScreenshotHelperObject helper;
+    private ScreenshotHelperObject m_helper;
 
     // path
     private string m_path;
@@ -132,7 +132,7 @@ public class ScreenshotHelperWindow : EditorWindow
         m_scroll = EditorGUILayout.BeginScrollView(m_scroll);
 
         // Error handling
-        if (helper != null && helper.isFileConflictOccured)
+        if (m_helper != null && m_helper.isFileConflictOccured)
         {
             HandleErrorOnGUI();
             return;
@@ -168,21 +168,21 @@ public class ScreenshotHelperWindow : EditorWindow
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Cancel", GUILayout.Height(60)))
         {
-            helper.RemoveComponentFromCamera();
+            m_helper.RemoveComponentFromCamera();
         }
 
         if (GUILayout.Button("Retry", GUILayout.Height(60)))
         {
             // Error resolved
-            if (!File.Exists($"{helper.conflictedFileFullPath}"))
+            if (!File.Exists($"{m_helper.conflictedFileFullPath}"))
             {
-                helper.Save();
+                m_helper.Save();
             }
         }
 
         if (GUILayout.Button("Replace", GUILayout.Height(60)))
         {
-            helper.Save();
+            m_helper.Save();
         }
 
         GUILayout.EndHorizontal();
@@ -386,13 +386,11 @@ public class ScreenshotHelperWindow : EditorWindow
                 MessageType.Info);
 
             m_fileName = EditorGUILayout.TextField("FileName", m_fileName);
-            m_showPrefixSuffix = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showPrefixSuffix, "Prefix & Suffix", true);
-            
             if (GUILayout.Button("Reset Index"))
             {
                 m_screenshotIdx = 0;
             }
-            
+            m_showPrefixSuffix = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showPrefixSuffix, "Prefix & Suffix", true);
             if (m_showPrefixSuffix)
             {
                 string[] displayedPrefixSuffixFormat =
@@ -533,6 +531,12 @@ public class ScreenshotHelperWindow : EditorWindow
             Debug.LogError("The path is invalid.");
             return;
         }
+        
+        if (m_createSubfolder && String.IsNullOrEmpty(m_subfolderName))
+        {
+            Debug.LogError("Input subfolder name.");
+            return;
+        }
 
         if (Camera.main == null)
         {
@@ -540,27 +544,27 @@ public class ScreenshotHelperWindow : EditorWindow
             return;
         }
         
-        helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
-        helper.path = $"{(m_createSubfolder ? m_path + "\\" + m_subfolderName : m_path)}";
+        m_helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
+        m_helper.path = $"{(m_createSubfolder ? m_path + "\\" + m_subfolderName : m_path)}";
         if (m_isAdvancedMode)
         {
-            helper.fileName = $"{ConvertPrefixSuffixFormat(m_fileName)}";
+            m_helper.fileName = $"{ConvertPrefixSuffixFormat(m_fileName)}";
             m_screenshotIdx++;
         }
         else
         {
-            helper.fileName = $"{m_prefix}{m_fileName}{m_suffix}{m_screenshotIdx++}";
+            m_helper.fileName = $"{m_prefix}{m_fileName}{m_suffix}{m_screenshotIdx++}";
         }
 
-        helper.fileFormat = m_currentEFileFormat.ToString().ToLower();
+        m_helper.fileFormat = m_currentEFileFormat.ToString().ToLower();
 
         switch (m_currentECaptureMode)
         {
             case ECaptureMode.IncludeUI:
-                helper.CaptureWithUI();
+                m_helper.CaptureWithUI();
                 break;
             case ECaptureMode.ExcludeUI:
-                helper.CaptureWithoutUI();
+                m_helper.CaptureWithoutUI();
                 break;
         }
     }

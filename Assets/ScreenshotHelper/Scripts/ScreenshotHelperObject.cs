@@ -18,7 +18,43 @@ public class ScreenshotHelperObject : MonoBehaviour
 
     private Camera m_cam;
     private bool m_isCameraRenderTextureSet;
-    private bool m_takeScreenshotOnPostRender;
+    private bool m_takeScreenshot;
+
+
+    // Defined by assembly
+#if USING_URP || USING_HDRP
+    private void Awake()
+    {
+        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+    }
+
+    private void OnEndCameraRendering(ScriptableRenderContext a, Camera b)
+    {
+        if (m_takeScreenshot)
+        {
+            PerformCapture();
+            m_takeScreenshot = false;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+    }
+#else
+    // Run as a last post-processing script, but do nothing and take a screenshot.
+    private void OnRenderImage(RenderTexture src, RenderTexture dest)
+    {
+        if (m_takeScreenshot)
+        {
+            PerformCapture();
+            m_takeScreenshot = false;
+        }
+
+        // Yup, this is meaningless, but exist for avoid warning
+        Graphics.Blit(src, dest);
+    }
+#endif
 
     public void CaptureWithUI()
     {
@@ -27,20 +63,7 @@ public class ScreenshotHelperObject : MonoBehaviour
 
     public void CaptureWithoutUI()
     {
-        m_takeScreenshotOnPostRender = true;
-    }
-
-    // Run as a last post-processing script, but do nothing and take a screenshot.
-    private void OnRenderImage(RenderTexture src, RenderTexture dest)
-    {
-        if (m_takeScreenshotOnPostRender)
-        {
-            PerformCapture();
-            m_takeScreenshotOnPostRender = false;
-        }
-
-        // Yup, this is meaningless, but exist for avoid warning
-        Graphics.Blit(src, dest);
+        m_takeScreenshot = true;
     }
 
     private IEnumerator WaitForEndOfFrameAndCapture()
