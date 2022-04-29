@@ -346,7 +346,7 @@ GameObject:
   - component: {fileID: 666113673}
   - component: {fileID: 666113676}
   m_Layer: 0
-  m_Name: Cube2
+  m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -400,7 +400,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f0846a04fb6aff443a1ec619fc81f133, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -875,10 +875,7 @@ MonoBehaviour:
 
 
     + Why don''t you try <color=red><b>[Advanced
-    Mode]</b></color>? It makes this tool more powerful.
-
-    + FYI, there is ReadMe
-    file, check it out!'
+    Mode]</b></color>? It makes this tool more powerful.'
 --- !u!222 &1092351735
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1406,7 +1403,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f0846a04fb6aff443a1ec619fc81f133, type: 2}
+  - {fileID: 2100000, guid: c488008d3b496644ca9337c12f1031be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
