@@ -45,6 +45,7 @@ public class ScreenshotHelperWindow : EditorWindow
     private EPrefixSuffixFormat m_currentSuffixFormat;
     private int m_selectedSeparator;
     private string m_currentSeparator;
+    private ScreenshotHelperObject helper;
 
     // path
     private string m_path;
@@ -100,6 +101,7 @@ public class ScreenshotHelperWindow : EditorWindow
     private bool m_showTimeSettings;
     private bool m_showIndexSettings;
 
+
     [MenuItem("Window/JB Studio/Screenshot Helper")]
     private static void Init()
     {
@@ -110,22 +112,112 @@ public class ScreenshotHelperWindow : EditorWindow
 
     private void OnGUI()
     {
+        // Set helper object
+        if (Camera.main == null)
+        {
+            Debug.LogError("There is no main camera.");
+            return;
+        }
+
+        // helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
+
         // Use rich text
         EditorStyles.wordWrappedLabel.richText = true;
         EditorStyles.boldLabel.richText = true;
         EditorStyles.label.richText = true;
         EditorStyles.helpBox.richText = true;
+        EditorStyles.helpBox.fontSize = 12;
 
+        // Initialize scroll view
         m_scroll = EditorGUILayout.BeginScrollView(m_scroll);
+
+        // Error handling
+        if (helper != null && helper.isFileConflictOccured)
+        {
+            HandleErrorOnGUI();
+            return;
+        }
+
         // Perform Capture
         GUILayout.Space(10f);
 
-        if (GUILayout.Button("Take a Screenshot", GUILayout.Height(70)))
+        if (GUILayout.Button("Take a Screenshot", GUILayout.Height(80)))
         {
             Capture();
         }
 
         // Set Path
+        SetPathOnGUI();
+
+        // Set file name
+        SetFileNameOnGUI();
+
+        // Miscellaneous settings
+        SetMiscellaneousOnGUI();
+
+        EditorGUILayout.EndScrollView();
+    }
+
+    private void HandleErrorOnGUI()
+    {
+        GUILayout.Space(10f);
+
+        GUILayout.Label("Error", EditorStyles.boldLabel);
+
+        EditorGUILayout.HelpBox($"File already Exists. Do you want to replace it?", MessageType.Error);
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Cancel", GUILayout.Height(60)))
+        {
+            helper.RemoveComponentFromCamera();
+        }
+
+        if (GUILayout.Button("Retry", GUILayout.Height(60)))
+        {
+            // Error resolved
+            if (!File.Exists($"{helper.conflictedFileFullPath}"))
+            {
+                helper.Save();
+            }
+        }
+
+        if (GUILayout.Button("Replace", GUILayout.Height(60)))
+        {
+            helper.Save();
+        }
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Open Existing File", GUILayout.Height(60)))
+        {
+            if (!Directory.Exists($"{m_path}\\{m_subfolderName}"))
+            {
+                Debug.Log("This file is not exist now.");
+            }
+            else
+            {
+                System.Diagnostics.Process.Start($"{m_path}\\{m_subfolderName}\\{m_fileName}.{m_currentEFileFormat}");
+            }
+        }
+
+        if (GUILayout.Button("Open Directory", GUILayout.Height(60)))
+        {
+            if (!Directory.Exists($"{m_path}\\{m_subfolderName}"))
+            {
+                Debug.Log("This directory is not exist now.");
+            }
+            else
+            {
+                System.Diagnostics.Process.Start($"{m_path}\\{m_subfolderName}");
+            }
+        }
+
+        GUILayout.EndHorizontal();
+        EditorGUILayout.EndScrollView();
+    }
+
+    private void SetPathOnGUI()
+    {
         GUILayout.Space(10f);
         GUILayout.Label($"Save Path", EditorStyles.boldLabel);
         GUILayout.Label(m_createSubfolder ? $"Current Path: {m_path}<color=yellow>{Path.DirectorySeparatorChar}{m_subfolderName}</color>" : $"Current Path: {m_path}",
@@ -176,8 +268,10 @@ public class ScreenshotHelperWindow : EditorWindow
 
         m_createSubfolder = EditorGUILayout.Toggle("Create Subfolder", m_createSubfolder);
         m_subfolderName = m_createSubfolder ? EditorGUILayout.TextField("Subfolder Name", m_subfolderName) : "";
+    }
 
-        // Set file name
+    private void SetFileNameOnGUI()
+    {
         GUILayout.Space(10f);
         GUILayout.Label($"File Name", EditorStyles.boldLabel);
 
@@ -293,6 +387,12 @@ public class ScreenshotHelperWindow : EditorWindow
 
             m_fileName = EditorGUILayout.TextField("FileName", m_fileName);
             m_showPrefixSuffix = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showPrefixSuffix, "Prefix & Suffix", true);
+            
+            if (GUILayout.Button("Reset Index"))
+            {
+                m_screenshotIdx = 0;
+            }
+            
             if (m_showPrefixSuffix)
             {
                 string[] displayedPrefixSuffixFormat =
@@ -336,8 +436,10 @@ public class ScreenshotHelperWindow : EditorWindow
             m_suffix = ConvertPrefixSuffixEnum(m_currentSuffixFormat);
             m_suffix = m_currentSuffixFormat == EPrefixSuffixFormat.None ? $"{m_suffix}{m_currentSeparator}" : $"{m_currentSeparator}{m_suffix}{m_currentSeparator}";
         }
+    }
 
-        // Miscellaneous settings
+    private void SetMiscellaneousOnGUI()
+    {
         GUILayout.Space(10f);
         GUILayout.Label("Miscellaneous", EditorStyles.boldLabel);
         m_currentEFileFormat = (EFileFormat) EditorGUILayout.EnumPopup("Format", m_currentEFileFormat);
@@ -360,8 +462,6 @@ public class ScreenshotHelperWindow : EditorWindow
                 Debug.Assert(false, m_currentECaptureMode);
                 break;
         }
-
-        EditorGUILayout.EndScrollView();
     }
 
     private string ConvertPrefixSuffixEnum(EPrefixSuffixFormat format)
@@ -439,9 +539,8 @@ public class ScreenshotHelperWindow : EditorWindow
             Debug.LogError("Main Camera not found.");
             return;
         }
-
-        ScreenshotHelperObject helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
-
+        
+        helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
         helper.path = $"{(m_createSubfolder ? m_path + "\\" + m_subfolderName : m_path)}";
         if (m_isAdvancedMode)
         {
@@ -453,7 +552,7 @@ public class ScreenshotHelperWindow : EditorWindow
             helper.fileName = $"{m_prefix}{m_fileName}{m_suffix}{m_screenshotIdx++}";
         }
 
-        helper.fileFormat = m_currentEFileFormat.ToString();
+        helper.fileFormat = m_currentEFileFormat.ToString().ToLower();
 
         switch (m_currentECaptureMode)
         {

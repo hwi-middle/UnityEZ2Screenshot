@@ -11,8 +11,13 @@ public class ScreenshotHelperObject : MonoBehaviour
     [HideInInspector] public string path;
     [HideInInspector] public string fileName;
     [HideInInspector] public string fileFormat;
+    [HideInInspector] public bool isFileConflictOccured;
+    [HideInInspector] public string conflictedFileFullPath;
+
+    private Texture2D m_textureToSave;
 
     private Camera m_cam;
+    private bool m_isCameraRenderTextureSet;
     private bool m_takeScreenshotOnPostRender;
 
     public void CaptureWithUI()
@@ -33,7 +38,7 @@ public class ScreenshotHelperObject : MonoBehaviour
             PerformCapture();
             m_takeScreenshotOnPostRender = false;
         }
-        
+
         // Yup, this is meaningless, but exist for avoid warning
         Graphics.Blit(src, dest);
     }
@@ -47,38 +52,64 @@ public class ScreenshotHelperObject : MonoBehaviour
     private void PerformCapture()
     {
         m_cam = Camera.main;
-
-        bool isCameraRenderTextureSet = m_cam.targetTexture != null;
+        m_isCameraRenderTextureSet = m_cam.targetTexture != null;
 
         var gameViewSize = UnityEditor.Handles.GetMainGameViewSize();
-        if (!isCameraRenderTextureSet)
+        if (!m_isCameraRenderTextureSet)
         {
             m_cam.targetTexture = RenderTexture.GetTemporary((int) gameViewSize.x, (int) gameViewSize.y);
         }
 
         RenderTexture renderTexture = m_cam.targetTexture;
-        Texture2D result = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
-        result.ReadPixels(new Rect(0f, 0f, renderTexture.width, renderTexture.height), 0, 0);
+        m_textureToSave = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+        m_textureToSave.ReadPixels(new Rect(0f, 0f, renderTexture.width, renderTexture.height), 0, 0);
 
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-
-        if (fileFormat == "PNG")
-        {
-            File.WriteAllBytes($"{path}/{fileName}.png", result.EncodeToPNG());
-            Debug.Log($"Saved as: {path}\\{fileName}.png");
-        }
-        else if (fileFormat == "JPG")
-        {
-            File.WriteAllBytes($"{path}/{fileName}.jpg", result.EncodeToJPG());
-            Debug.Log($"Saved as: {path}\\{fileName}.jpg");
-        }
-
-        if (!isCameraRenderTextureSet)
+        if (!m_isCameraRenderTextureSet)
         {
             m_cam.targetTexture = null;
         }
+
+        if (File.Exists($"{path}\\{fileName}.{fileFormat}"))
+        {
+            isFileConflictOccured = true;
+            conflictedFileFullPath = $"{path}\\{fileName}.{fileFormat}";
+            Debug.LogError($"{fileName}.{fileFormat} already exists!");
+            return;
+        }
+
+        Save();
+    }
+
+    public void Save()
+    {
+        isFileConflictOccured = false; // This function called when the error has been resolved
+
+        byte[] result = null;
+        if (fileFormat == "png")
+        {
+            result = m_textureToSave.EncodeToPNG();
+        }
+        else if (fileFormat == "jpg")
+        {
+            result = m_textureToSave.EncodeToJPG();
+        }
+
+        if (result != null)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            File.WriteAllBytes($"{path}\\{fileName}.{fileFormat}", result);
+        }
+
+        RemoveComponentFromCamera();
+        Debug.Log($"Saved as: {path}\\{fileName}.{fileFormat}");
+    }
+
+    public void RemoveComponentFromCamera()
+    {
+        Destroy(this);
     }
 }
