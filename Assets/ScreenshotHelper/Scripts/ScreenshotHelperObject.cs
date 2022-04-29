@@ -10,7 +10,7 @@ public class ScreenshotHelperObject : MonoBehaviour
 {
     [HideInInspector] public string path;
     [HideInInspector] public string fileName;
-    [HideInInspector] public string format;
+    [HideInInspector] public string fileFormat;
 
     private Camera m_cam;
     private bool m_takeScreenshotOnPostRender;
@@ -25,6 +25,7 @@ public class ScreenshotHelperObject : MonoBehaviour
         m_takeScreenshotOnPostRender = true;
     }
 
+    // Run as a last post-processing script, but do nothing and take a screenshot.
     private void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
         if (m_takeScreenshotOnPostRender)
@@ -32,6 +33,9 @@ public class ScreenshotHelperObject : MonoBehaviour
             PerformCapture();
             m_takeScreenshotOnPostRender = false;
         }
+        
+        // Yup, this is meaningless, but exist for avoid warning
+        Graphics.Blit(src, dest);
     }
 
     private IEnumerator WaitForEndOfFrameAndCapture()
@@ -61,12 +65,12 @@ public class ScreenshotHelperObject : MonoBehaviour
             Directory.CreateDirectory(path);
         }
 
-        if (format == "PNG")
+        if (fileFormat == "PNG")
         {
             File.WriteAllBytes($"{path}/{fileName}.png", result.EncodeToPNG());
             Debug.Log($"Saved as: {path}\\{fileName}.png");
         }
-        else if (format == "JPG")
+        else if (fileFormat == "JPG")
         {
             File.WriteAllBytes($"{path}/{fileName}.jpg", result.EncodeToJPG());
             Debug.Log($"Saved as: {path}\\{fileName}.jpg");
