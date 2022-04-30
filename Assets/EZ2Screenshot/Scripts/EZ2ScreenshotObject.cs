@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Camera))]
-public class ScreenshotHelperObject : MonoBehaviour
+public class EZ2ScreenshotObject : MonoBehaviour
 {
     [HideInInspector] public string path;
     [HideInInspector] public string fileName;

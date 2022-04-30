@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ScreenshotHelperWindow : EditorWindow
+public class EZ2ScreenshotWindow : EditorWindow
 {
     // capture settings
     private enum ECaptureMode
@@ -44,7 +44,7 @@ public class ScreenshotHelperWindow : EditorWindow
     private EPrefixSuffixFormat m_currentSuffixFormat;
     private int m_selectedSeparator;
     private string m_currentSeparator;
-    private ScreenshotHelperObject m_helper;
+    private EZ2ScreenshotObject m_helper;
 
     // path
     private string m_path;
@@ -101,12 +101,16 @@ public class ScreenshotHelperWindow : EditorWindow
     private bool m_showIndexSettings;
 
 
-    [MenuItem("Window/JB Studio/Screenshot Helper")]
+    [MenuItem("Window/JB Studio/EZ2Screenshot")]
     private static void Init()
     {
-        ScreenshotHelperWindow window = (ScreenshotHelperWindow) GetWindow(typeof(ScreenshotHelperWindow));
-        window.titleContent.text = "Screenshot Helper";
-        // window.minSize = new Vector2(340f, 150f);
+        EZ2ScreenshotWindow window = (EZ2ScreenshotWindow) GetWindow(typeof(EZ2ScreenshotWindow));
+        window.titleContent.text = "EZ2Screenshot";
+    }
+
+    private void Awake()
+    {
+        m_path = Path.GetDirectoryName(Application.dataPath);
     }
 
     private void OnGUI()
@@ -117,8 +121,6 @@ public class ScreenshotHelperWindow : EditorWindow
             Debug.LogError("There is no main camera.");
             return;
         }
-
-        // helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
 
         // Use rich text
         EditorStyles.wordWrappedLabel.richText = true;
@@ -389,6 +391,7 @@ public class ScreenshotHelperWindow : EditorWindow
             {
                 m_screenshotIdx = 0;
             }
+
             m_showPrefixSuffix = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showPrefixSuffix, "Prefix & Suffix", true);
             if (m_showPrefixSuffix)
             {
@@ -530,7 +533,7 @@ public class ScreenshotHelperWindow : EditorWindow
             Debug.LogError("The path is invalid.");
             return;
         }
-        
+
         if (m_createSubfolder && String.IsNullOrEmpty(m_subfolderName))
         {
             Debug.LogError("Input subfolder name.");
@@ -542,8 +545,8 @@ public class ScreenshotHelperWindow : EditorWindow
             Debug.LogError("Main Camera not found.");
             return;
         }
-        
-        m_helper = Camera.main.gameObject.GetOrAddComponent<ScreenshotHelperObject>();
+
+        m_helper = Camera.main.gameObject.GetOrAddComponent<EZ2ScreenshotObject>();
         m_helper.path = $"{(m_createSubfolder ? m_path + "\\" + m_subfolderName : m_path)}";
         if (m_isAdvancedMode)
         {
