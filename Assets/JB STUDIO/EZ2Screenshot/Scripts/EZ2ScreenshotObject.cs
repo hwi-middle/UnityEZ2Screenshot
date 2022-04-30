@@ -25,10 +25,10 @@ public class EZ2ScreenshotObject : MonoBehaviour
 #if USING_URP || USING_HDRP
     private void Awake()
     {
-        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
+        RenderPipelineManager.endContextRendering += OnEndCameraRendering;
     }
 
-    private void OnEndCameraRendering(ScriptableRenderContext a, Camera b)
+    private void OnEndCameraRendering(ScriptableRenderContext context, List<Camera> cameras)
     {
         if (m_takeScreenshot)
         {
@@ -39,7 +39,7 @@ public class EZ2ScreenshotObject : MonoBehaviour
 
     private void OnDestroy()
     {
-        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
+        RenderPipelineManager.endContextRendering -= OnEndCameraRendering;
     }
 #else
     // Run as a last post-processing script, but do nothing and take a screenshot.
