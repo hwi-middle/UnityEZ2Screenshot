@@ -551,11 +551,12 @@ public class EZ2ScreenshotWindow : EditorWindow
         if (m_isAdvancedMode)
         {
             m_helper.fileName = $"{ConvertPrefixSuffixFormat(m_fileName)}";
-            m_screenshotIdx++;
+            m_screenshotIdx += m_incrementalValue;
         }
         else
         {
-            m_helper.fileName = $"{m_prefix}{m_fileName}{m_suffix}{m_screenshotIdx++}";
+            m_helper.fileName = $"{m_prefix}{m_fileName}{m_suffix}{m_screenshotIdx:D4}";
+            m_screenshotIdx++;
         }
 
         m_helper.fileFormat = m_currentEFileFormat.ToString().ToLower();
