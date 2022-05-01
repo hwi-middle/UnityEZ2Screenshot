@@ -96,7 +96,10 @@ public class EZ2ScreenshotObject : MonoBehaviour
         {
             isFileConflictOccured = true;
             conflictedFileFullPath = $"{path}\\{fileName}.{fileFormat}";
-            Debug.LogError($"{fileName}.{fileFormat} already exists!");
+            string msg = GetLocalizedString("log_error_already_exist")
+                .Replace("{fileName}", $"{fileName}")
+                .Replace("{fileFormat}", $"{fileFormat}");
+            Debug.LogError(msg);
             return;
         }
 
@@ -128,11 +131,20 @@ public class EZ2ScreenshotObject : MonoBehaviour
         }
 
         RemoveComponentFromCamera();
-        Debug.Log($"Saved as: {path}\\{fileName}.{fileFormat}");
+        string msg = GetLocalizedString("log_info_saved_as")
+            .Replace("{path}", $"{path}")
+            .Replace("{fileName}", $"{fileName}")
+            .Replace("{fileFormat}", $"{fileFormat}");
+        Debug.Log(msg);
     }
 
     public void RemoveComponentFromCamera()
     {
         Destroy(this);
+    }
+
+    private string GetLocalizedString(string key)
+    {
+        return EZ2ScreenshotLocalizer.TranslateText(key);
     }
 }

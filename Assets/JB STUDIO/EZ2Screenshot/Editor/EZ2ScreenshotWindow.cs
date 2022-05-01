@@ -139,10 +139,13 @@ public class EZ2ScreenshotWindow : EditorWindow
             return;
         }
 
+        // Set Language
+        SetLanguageOnGUI();
+
         // Perform Capture
         GUILayout.Space(10f);
 
-        if (GUILayout.Button("Take a Screenshot", GUILayout.Height(80)))
+        if (GUILayout.Button(GetLocalizedString("gui_take_screenshot"), GUILayout.Height(80)))
         {
             Capture();
         }
@@ -163,16 +166,16 @@ public class EZ2ScreenshotWindow : EditorWindow
     {
         GUILayout.Space(10f);
 
-        GUILayout.Label("Error", EditorStyles.boldLabel);
+        GUILayout.Label(GetLocalizedString("gui_error_title"), EditorStyles.boldLabel);
 
-        EditorGUILayout.HelpBox($"File already Exists. Do you want to replace it?", MessageType.Error);
+        EditorGUILayout.HelpBox(GetLocalizedString("gui_error_file_exist_question"), MessageType.Error);
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Cancel", GUILayout.Height(60)))
+        if (GUILayout.Button(GetLocalizedString("gui_error_file_exist_cancel"), GUILayout.Height(60)))
         {
             m_helper.RemoveComponentFromCamera();
         }
 
-        if (GUILayout.Button("Retry", GUILayout.Height(60)))
+        if (GUILayout.Button(GetLocalizedString("gui_error_file_exist_retry"), GUILayout.Height(60)))
         {
             // Error resolved
             if (!File.Exists($"{m_helper.conflictedFileFullPath}"))
@@ -181,7 +184,7 @@ public class EZ2ScreenshotWindow : EditorWindow
             }
         }
 
-        if (GUILayout.Button("Replace", GUILayout.Height(60)))
+        if (GUILayout.Button(GetLocalizedString("gui_error_file_exist_replace"), GUILayout.Height(60)))
         {
             m_helper.Save();
         }
@@ -189,11 +192,11 @@ public class EZ2ScreenshotWindow : EditorWindow
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Open Existing File", GUILayout.Height(60)))
+        if (GUILayout.Button(GetLocalizedString("gui_error_file_exist_open_existing_file"), GUILayout.Height(60)))
         {
             if (!Directory.Exists($"{m_path}\\{m_subfolderName}"))
             {
-                Debug.Log("This file is not exist now.");
+                Debug.Log(GetLocalizedString("log_error_file_not_exist_now"));
             }
             else
             {
@@ -201,11 +204,11 @@ public class EZ2ScreenshotWindow : EditorWindow
             }
         }
 
-        if (GUILayout.Button("Open Directory", GUILayout.Height(60)))
+        if (GUILayout.Button(GetLocalizedString("gui_error_file_exist_open_existing_dir"), GUILayout.Height(60)))
         {
             if (!Directory.Exists($"{m_path}\\{m_subfolderName}"))
             {
-                Debug.Log("This directory is not exist now.");
+                Debug.Log(GetLocalizedString("log_error_dir_not_exit_now"));
             }
             else
             {
@@ -217,47 +220,63 @@ public class EZ2ScreenshotWindow : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
+    private void SetLanguageOnGUI()
+    {
+        GUILayout.Space(10f);
+        GUILayout.Label(GetLocalizedString("gui_language_title"), EditorStyles.boldLabel);
+
+        string[] displayedLanguage =
+        {
+            "English",
+            "한국어",
+        };
+        EZ2ScreenshotLocalizer.CurrentLang = (EZ2ScreenshotLocalizer.EZ2ScreenshotLang) EditorGUILayout.Popup(GetLocalizedString("gui_language_yours"), (int) EZ2ScreenshotLocalizer.CurrentLang, displayedLanguage);
+    }
+
     private void SetPathOnGUI()
     {
         GUILayout.Space(10f);
-        GUILayout.Label($"Save Path", EditorStyles.boldLabel);
-        GUILayout.Label(m_createSubfolder ? $"Current Path: {m_path}<color=yellow>{Path.DirectorySeparatorChar}{m_subfolderName}</color>" : $"Current Path: {m_path}",
+        GUILayout.Label(GetLocalizedString("gui_save_path_title"), EditorStyles.boldLabel);
+        GUILayout.Label(
+            m_createSubfolder
+                ? $"{GetLocalizedString("gui_current_path")}: {m_path}<color=yellow>{Path.DirectorySeparatorChar}{m_subfolderName}</color>"
+                : $"{GetLocalizedString("gui_current_path")}: {m_path}",
             EditorStyles.wordWrappedLabel);
 
         if (!IsPathValid())
         {
-            GUILayout.Label($"<color=red><b>Set valid path to save screenshot!</b></color>", EditorStyles.wordWrappedLabel);
+            GUILayout.Label($"<color=red><b>{GetLocalizedString("gui_error_set_valid_path")}</b></color>", EditorStyles.wordWrappedLabel);
         }
 
-        GUILayout.Label($"Save screenshots to ...", EditorStyles.wordWrappedLabel);
+        GUILayout.Label(GetLocalizedString("gui_save_to"), EditorStyles.wordWrappedLabel);
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Project Directory (Default)"))
+        if (GUILayout.Button(GetLocalizedString("gui_dir_proj")))
         {
             m_path = Path.GetDirectoryName(Application.dataPath);
-            Debug.Log($"New path assigned: {m_path}");
+            Debug.Log(GetLocalizedString("log_info_new_path").Replace("{path}", $"{m_path}"));
         }
 
-        if (GUILayout.Button("Desktop"))
+        if (GUILayout.Button(GetLocalizedString("gui_dir_desktop")))
         {
             m_path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            Debug.Log($"New path assigned: {m_path}");
+            Debug.Log(GetLocalizedString("log_info_new_path").Replace("{path}", $"{m_path}"));
         }
 
-        if (GUILayout.Button("My Pictures"))
+        if (GUILayout.Button(GetLocalizedString("gui_dir_my_pictures")))
         {
             m_path = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-            Debug.Log($"New path assigned: {m_path}");
+            Debug.Log(GetLocalizedString("log_info_new_path").Replace("{path}", $"{m_path}"));
         }
 
-        if (GUILayout.Button("Custom Path"))
+        if (GUILayout.Button(GetLocalizedString("gui_dir_custom")))
         {
             SetCustomPath();
-            Debug.Log($"New path assigned: {m_path}");
+            Debug.Log(GetLocalizedString("log_info_new_path").Replace("{path}", $"{m_path}"));
         }
 
         GUILayout.EndHorizontal();
-        if (GUILayout.Button("Open Current Path in Explorer"))
+        if (GUILayout.Button(GetLocalizedString("gui_open_cur_path")))
         {
             if (!Directory.Exists($"{m_path}\\{m_subfolderName}"))
             {
@@ -267,78 +286,79 @@ public class EZ2ScreenshotWindow : EditorWindow
             System.Diagnostics.Process.Start($"{m_path}\\{m_subfolderName}");
         }
 
-        m_createSubfolder = EditorGUILayout.Toggle("Create Subfolder", m_createSubfolder);
-        m_subfolderName = m_createSubfolder ? EditorGUILayout.TextField("Subfolder Name", m_subfolderName) : "";
+        m_createSubfolder = EditorGUILayout.Toggle(GetLocalizedString("gui_create_subfolder"), m_createSubfolder);
+        m_subfolderName = m_createSubfolder ? EditorGUILayout.TextField(GetLocalizedString("gui_subfolder_name"), m_subfolderName) : "";
     }
 
     private void SetFileNameOnGUI()
     {
         GUILayout.Space(10f);
-        GUILayout.Label($"File Name", EditorStyles.boldLabel);
+        GUILayout.Label(GetLocalizedString("gui_file_name_title"), EditorStyles.boldLabel);
 
-        m_isAdvancedMode = EditorGUILayout.Toggle($"Advanced Mode", m_isAdvancedMode);
+        m_isAdvancedMode = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_mode"), m_isAdvancedMode);
         if (m_isAdvancedMode)
         {
-            EditorGUILayout.HelpBox($"Final file name: <b>{ConvertPrefixSuffixFormat(m_fileName)}.{m_currentEFileFormat.ToString().ToLower()}</b>", MessageType.Info);
-            m_fileName = EditorGUILayout.TextField("FileName", m_fileName);
-            m_showFormatGuide = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showFormatGuide, "Advanced Format Guide", true);
+            EditorGUILayout.HelpBox($"{GetLocalizedString("gui_final_file_name")}: <b>{ConvertPrefixSuffixFormat(m_fileName)}.{m_currentEFileFormat.ToString().ToLower()}</b>",
+                MessageType.Info);
+            m_fileName = EditorGUILayout.TextField(GetLocalizedString("gui_file_name"), m_fileName);
+            m_showFormatGuide = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showFormatGuide, GetLocalizedString("gui_advanced_guide_title"), true);
             if (m_showFormatGuide)
             {
                 GUILayout.Label(
-                    "<b>{Date}:</b> Date\n" +
-                    "<b>{Time}:</b> Current Time\n" +
-                    "<b>{Idx}:</b> Index Number\n" +
-                    "<b>{Product}:</b> Product Name " + $"({Application.productName})\n" +
-                    "<b>{Scene}:</b>\n" +
-                    "For example, <b>\"{Product}_Screenshot\"</b> will replace with " + $"<b>\"{Application.productName}_Screenshot\"</b>", EditorStyles.wordWrappedLabel);
+                    "<b>{Date}:</b>" + $" {GetLocalizedString("gui_advanced_guide_date")}\n" +
+                    "<b>{Time}:</b>" + $" {GetLocalizedString("gui_advanced_guide_time")}\n" +
+                    "<b>{Idx}:</b>" + $" {GetLocalizedString("gui_advanced_guide_idx")}\n" +
+                    "<b>{Product}:</b>" + $" {GetLocalizedString("gui_advanced_guide_product")}\n" +
+                    "<b>{Scene}:</b>" + $" {GetLocalizedString("gui_advanced_guide_scene")}\n" +
+                    $"{GetLocalizedString("gui_advanced_guide_example").Replace("{productName}", $"{Application.productName}")}", EditorStyles.wordWrappedLabel);
             }
 
             // Date Settings
-            m_showDateSettings = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showDateSettings, "Date Settings", true);
+            m_showDateSettings = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showDateSettings, GetLocalizedString("gui_advanced_date_title"), true);
             if (m_showDateSettings)
             {
-                EditorGUILayout.HelpBox($"Current Date Format: {m_dateFormat}", MessageType.None);
+                EditorGUILayout.HelpBox($"{GetLocalizedString("gui_advanced_date_current_format")}: {m_dateFormat}", MessageType.None);
 
                 string[] dateFormat =
                 {
-                    "Month-Day-Year",
-                    "Day-Month-Year",
-                    "Year-Month-Day",
+                    $"{GetLocalizedString("gui_advanced_date_item_mdy")}",
+                    $"{GetLocalizedString("gui_advanced_date_item_dmy")}",
+                    $"{GetLocalizedString("gui_advanced_date_item_ymd")}",
                 };
                 m_dateType = (EDateType) EditorGUILayout.Popup("Date Format", (int) m_dateType, dateFormat);
-                m_useTwoDigitYear = EditorGUILayout.Toggle("2-digit Year", m_useTwoDigitYear);
-                m_dateSeparator = EditorGUILayout.TextField("Separator", m_dateSeparator);
-                m_useZerofillDate = EditorGUILayout.Toggle("Leading Zero", m_useZerofillDate);
+                m_useTwoDigitYear = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_date_2digit_year"), m_useTwoDigitYear);
+                m_dateSeparator = EditorGUILayout.TextField(GetLocalizedString("gui_advanced_date_separator"), m_dateSeparator);
+                m_useZerofillDate = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_date_leading_zero"), m_useZerofillDate);
             }
 
             // Time Settings
-            m_showTimeSettings = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showTimeSettings, "Time Settings", true);
+            m_showTimeSettings = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showTimeSettings, GetLocalizedString("gui_advanced_time_title"), true);
             if (m_showTimeSettings)
             {
-                EditorGUILayout.HelpBox($"Current Time Format: {m_timeFormat}", MessageType.None);
+                EditorGUILayout.HelpBox($"{GetLocalizedString("gui_advanced_time_current_format")}: {m_timeFormat}", MessageType.None);
 
                 string[] timeFormat =
                 {
-                    "12H",
-                    "24H",
+                    $"{GetLocalizedString("gui_advanced_time_item_12h")}",
+                    $"{GetLocalizedString("gui_advanced_time_item_24h")}",
                 };
 
-                m_timeType = (ETimeType) EditorGUILayout.Popup("12H/24H", (int) m_timeType, timeFormat);
-                m_useSeconds = EditorGUILayout.Toggle("Show seconds", m_useSeconds);
-                m_timeSeparator = EditorGUILayout.TextField("Separator", m_timeSeparator);
-                m_useZerofillTime = EditorGUILayout.Toggle("Leading Zero", m_useZerofillTime);
+                m_timeType = (ETimeType) EditorGUILayout.Popup(GetLocalizedString("gui_advanced_time_12h_24h"), (int) m_timeType, timeFormat);
+                m_useSeconds = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_time_show_sec"), m_useSeconds);
+                m_timeSeparator = EditorGUILayout.TextField(GetLocalizedString("gui_advanced_time_separator"), m_timeSeparator);
+                m_useZerofillTime = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_time_leading_zero"), m_useZerofillTime);
             }
 
             // Index Settings
-            m_showIndexSettings = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showIndexSettings, "Index Settings", true);
+            m_showIndexSettings = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showIndexSettings, GetLocalizedString("gui_advanced_index_title"), true);
             if (m_showIndexSettings)
             {
-                EditorGUILayout.HelpBox($"Current Index: {m_screenshotIdx.ToString($"D{m_minDigits}")}\n" +
-                                        $"Next Index: {(m_screenshotIdx + m_incrementalValue).ToString($"D{m_minDigits}")}", MessageType.None);
+                EditorGUILayout.HelpBox($"{GetLocalizedString("gui_advanced_index_info_current_index")}: {m_screenshotIdx.ToString($"D{m_minDigits}")}\n" +
+                                        $"{GetLocalizedString("gui_advanced_index_info_next_index")}: {(m_screenshotIdx + m_incrementalValue).ToString($"D{m_minDigits}")}", MessageType.None);
 
-                m_screenshotIdx = EditorGUILayout.IntField("Current Index", m_screenshotIdx);
-                m_incrementalValue = EditorGUILayout.IntField("Incremental Value", m_incrementalValue);
-                m_minDigits = EditorGUILayout.IntSlider("Minimum Digits", m_minDigits, 1, 10);
+                m_screenshotIdx = EditorGUILayout.IntField(GetLocalizedString("gui_advanced_index_current_index"), m_screenshotIdx);
+                m_incrementalValue = EditorGUILayout.IntField(GetLocalizedString("gui_advanced_index_incremental_value"), m_incrementalValue);
+                m_minDigits = EditorGUILayout.IntSlider(GetLocalizedString("gui_advanced_index_minimum_digits"), m_minDigits, 1, 10);
             }
 
             // Set Values
@@ -383,29 +403,29 @@ public class EZ2ScreenshotWindow : EditorWindow
         else
         {
             EditorGUILayout.HelpBox(
-                $"Final file name: <color=yellow>{m_prefix}</color>{m_fileName}<color=yellow>{m_suffix}{m_screenshotIdx:D4}</color>.{m_currentEFileFormat.ToString().ToLower()}",
+                $"{GetLocalizedString("gui_final_file_name")}: <color=yellow>{m_prefix}</color>{m_fileName}<color=yellow>{m_suffix}{m_screenshotIdx:D4}</color>.{m_currentEFileFormat.ToString().ToLower()}",
                 MessageType.Info);
 
-            m_fileName = EditorGUILayout.TextField("FileName", m_fileName);
-            if (GUILayout.Button("Reset Index"))
+            m_fileName = EditorGUILayout.TextField(GetLocalizedString("gui_file_name"), m_fileName);
+            if (GUILayout.Button(GetLocalizedString("gui_reset_index")))
             {
                 m_screenshotIdx = 0;
             }
 
-            m_showPrefixSuffix = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showPrefixSuffix, "Prefix & Suffix", true);
+            m_showPrefixSuffix = EditorGUI.Foldout(EditorGUILayout.GetControlRect(), m_showPrefixSuffix, GetLocalizedString("gui_prefix_and_suffix"), true);
             if (m_showPrefixSuffix)
             {
                 string[] displayedPrefixSuffixFormat =
                 {
-                    "None",
-                    "Date (MM.dd.yyyy)",
-                    "Date (dd.MM.yyyy)",
-                    "Date (yyyy.MM.dd)",
-                    "Time (hh_mm_ss, 12H)",
-                    "Time (HH_mm_ss, 24H)",
+                    $"{GetLocalizedString("gui_prefix_suffix_item_none")}",
+                    $"{GetLocalizedString("gui_prefix_suffix_item_date")} (MM.dd.yyyy)",
+                    $"{GetLocalizedString("gui_prefix_suffix_item_date")} (dd.MM.yyyy)",
+                    $"{GetLocalizedString("gui_prefix_suffix_item_date")} (yyyy.MM.dd)",
+                    $"{GetLocalizedString("gui_prefix_suffix_item_time")} (hh_mm_ss, 12H)",
+                    $"{GetLocalizedString("gui_prefix_suffix_item_time")} (HH_mm_ss, 24H)",
                 };
-                m_currentPrefixFormat = (EPrefixSuffixFormat) EditorGUILayout.Popup("Prefix", (int) m_currentPrefixFormat, displayedPrefixSuffixFormat);
-                m_currentSuffixFormat = (EPrefixSuffixFormat) EditorGUILayout.Popup("Suffix", (int) m_currentSuffixFormat, displayedPrefixSuffixFormat);
+                m_currentPrefixFormat = (EPrefixSuffixFormat) EditorGUILayout.Popup(GetLocalizedString("gui_prefix"), (int) m_currentPrefixFormat, displayedPrefixSuffixFormat);
+                m_currentSuffixFormat = (EPrefixSuffixFormat) EditorGUILayout.Popup(GetLocalizedString("gui_suffix"), (int) m_currentSuffixFormat, displayedPrefixSuffixFormat);
             }
 
             string[] prefixSuffixSeparator =
@@ -414,10 +434,10 @@ public class EZ2ScreenshotWindow : EditorWindow
                 "-",
                 ".",
                 @":",
-                "(Space)",
-                "None",
+                $"({GetLocalizedString("gui_separator_item_space")})",
+                $"{GetLocalizedString("gui_separator_item_none")}",
             };
-            m_selectedSeparator = EditorGUILayout.Popup("Separator", m_selectedSeparator, prefixSuffixSeparator);
+            m_selectedSeparator = EditorGUILayout.Popup(GetLocalizedString("gui_separator"), m_selectedSeparator, prefixSuffixSeparator);
             switch (prefixSuffixSeparator[m_selectedSeparator])
             {
                 case "(Space)":
@@ -441,14 +461,14 @@ public class EZ2ScreenshotWindow : EditorWindow
     private void SetMiscellaneousOnGUI()
     {
         GUILayout.Space(10f);
-        GUILayout.Label("Miscellaneous", EditorStyles.boldLabel);
-        m_currentEFileFormat = (EFileFormat) EditorGUILayout.EnumPopup("Format", m_currentEFileFormat);
+        GUILayout.Label(GetLocalizedString("gui_miscellaneous"), EditorStyles.boldLabel);
+        m_currentEFileFormat = (EFileFormat) EditorGUILayout.EnumPopup(GetLocalizedString("gui_format"), m_currentEFileFormat);
         string[] displayedCaptureOptions =
         {
-            "Include UI",
-            "Don't Include UI",
+            $"{GetLocalizedString("gui_item_include_ui")}",
+            $"{GetLocalizedString("gui_item_exclude_ui")}",
         };
-        m_currentECaptureMode = (ECaptureMode) EditorGUILayout.Popup("Capture Mode", (int) m_currentECaptureMode, displayedCaptureOptions);
+        m_currentECaptureMode = (ECaptureMode) EditorGUILayout.Popup(GetLocalizedString("gui_capture_mode"), (int) m_currentECaptureMode, displayedCaptureOptions);
 
         switch (m_currentECaptureMode)
         {
@@ -518,6 +538,11 @@ public class EZ2ScreenshotWindow : EditorWindow
     {
         if (String.IsNullOrEmpty(m_path) || !Directory.Exists(m_path)) return false;
         return true;
+    }
+
+    private string GetLocalizedString(string key)
+    {
+        return EZ2ScreenshotLocalizer.TranslateText(key);
     }
 
     private void Capture()
