@@ -230,7 +230,8 @@ public class EZ2ScreenshotWindow : EditorWindow
             "English",
             "한국어",
         };
-        EZ2ScreenshotLocalizer.CurrentLang = (EZ2ScreenshotLocalizer.EZ2ScreenshotLang) EditorGUILayout.Popup(GetLocalizedString("gui_language_yours"), (int) EZ2ScreenshotLocalizer.CurrentLang, displayedLanguage);
+        EZ2ScreenshotLocalizer.CurrentLang =
+            (EZ2ScreenshotLocalizer.EZ2ScreenshotLang) EditorGUILayout.Popup(GetLocalizedString("gui_language_yours"), (int) EZ2ScreenshotLocalizer.CurrentLang, displayedLanguage);
     }
 
     private void SetPathOnGUI()
@@ -325,7 +326,7 @@ public class EZ2ScreenshotWindow : EditorWindow
                     $"{GetLocalizedString("gui_advanced_date_item_dmy")}",
                     $"{GetLocalizedString("gui_advanced_date_item_ymd")}",
                 };
-                m_dateType = (EDateType) EditorGUILayout.Popup("Date Format", (int) m_dateType, dateFormat);
+                m_dateType = (EDateType) EditorGUILayout.Popup(GetLocalizedString("gui_advanced_date_date_format"), (int) m_dateType, dateFormat);
                 m_useTwoDigitYear = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_date_2digit_year"), m_useTwoDigitYear);
                 m_dateSeparator = EditorGUILayout.TextField(GetLocalizedString("gui_advanced_date_separator"), m_dateSeparator);
                 m_useZerofillDate = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_date_leading_zero"), m_useZerofillDate);
@@ -354,7 +355,8 @@ public class EZ2ScreenshotWindow : EditorWindow
             if (m_showIndexSettings)
             {
                 EditorGUILayout.HelpBox($"{GetLocalizedString("gui_advanced_index_info_current_index")}: {m_screenshotIdx.ToString($"D{m_minDigits}")}\n" +
-                                        $"{GetLocalizedString("gui_advanced_index_info_next_index")}: {(m_screenshotIdx + m_incrementalValue).ToString($"D{m_minDigits}")}", MessageType.None);
+                                        $"{GetLocalizedString("gui_advanced_index_info_next_index")}: {(m_screenshotIdx + m_incrementalValue).ToString($"D{m_minDigits}")}",
+                    MessageType.None);
 
                 m_screenshotIdx = EditorGUILayout.IntField(GetLocalizedString("gui_advanced_index_current_index"), m_screenshotIdx);
                 m_incrementalValue = EditorGUILayout.IntField(GetLocalizedString("gui_advanced_index_incremental_value"), m_incrementalValue);
