@@ -557,25 +557,25 @@ public class EZ2ScreenshotWindow : EditorWindow
     {
         if (!Application.isPlaying)
         {
-            Debug.LogError("The Unity Editor must be in Play Mode.");
+            Debug.LogError(GetLocalizedString("log_error_editor_not_play_mode"));
             return;
         }
 
         if (!IsPathValid())
         {
-            Debug.LogError("The path is invalid.");
+            Debug.LogError(GetLocalizedString("log_error_path_invalid"));
             return;
         }
 
         if (m_createSubfolder && String.IsNullOrEmpty(m_subfolderName))
         {
-            Debug.LogError("Input subfolder name.");
+            Debug.LogError(GetLocalizedString("log_error_empty_subfolder_name"));
             return;
         }
 
         if (Camera.main == null)
         {
-            Debug.LogError("Main Camera not found.");
+            Debug.LogError(GetLocalizedString("log_error_main_cam_not_exit"));
             return;
         }
 
