@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Text.Json;
+using UnityEditor;
 
 public static class EZ2ScreenshotLocalizer
 {
@@ -13,16 +14,19 @@ public static class EZ2ScreenshotLocalizer
         Japanese,
     }
 
-    private static EZ2ScreenshotLang _currentLang;
+    private static EZ2ScreenshotLang _currentLang = (EZ2ScreenshotLang) EditorPrefs.GetInt("CurrentLanguage", 0);
+
     public static EZ2ScreenshotLang CurrentLang
     {
         get => _currentLang;
         set
         {
             _currentLang = value;
+            EditorPrefs.SetInt("CurrentLanguage", (int) value);
             Init();
         }
     }
+
     private static Dictionary<string, string> _data;
 
     public static string TranslateText(string key)
