@@ -22,7 +22,7 @@ public static class EZ2ScreenshotLocalizer
         set
         {
             _currentLang = value;
-            EditorPrefs.SetInt("CurrentLanguage", (int) value);
+            EditorPrefs.SetInt("Language", (int) value);
             Init();
         }
     }
