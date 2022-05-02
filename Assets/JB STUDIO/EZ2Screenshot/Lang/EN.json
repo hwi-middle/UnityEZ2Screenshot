@@ -31,6 +31,7 @@
   "gui_miscellaneous": "Miscellaneous",
   "gui_format": "Format",
   "gui_capture_mode": "Capture Mode",
+  "gui_reset_all_settings": "Reset All Settings",
   "gui_advanced_guide_title": "Advanced Format Guide",
   "gui_advanced_guide_date": "Date",
   "gui_advanced_guide_time": "Time",

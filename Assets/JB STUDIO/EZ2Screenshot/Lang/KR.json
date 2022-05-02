@@ -31,6 +31,7 @@
   "gui_miscellaneous": "기타 설정",
   "gui_format": "형식",
   "gui_capture_mode": "캡처 모드",
+  "gui_reset_all_settings": "모든 설정 초기화",
   "gui_advanced_guide_title": "고급 모드 포맷 안내",
   "gui_advanced_guide_date": "날짜",
   "gui_advanced_guide_time": "시간",

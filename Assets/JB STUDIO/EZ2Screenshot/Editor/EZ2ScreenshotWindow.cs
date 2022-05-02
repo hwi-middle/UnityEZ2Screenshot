@@ -53,7 +53,7 @@ public class EZ2ScreenshotWindow : EditorWindow
 
     // file name
     private bool m_isAdvancedMode;
-    private string m_fileName = "screenshot";
+    private string m_fileName;
     private int m_screenshotIdx;
     private string m_prefix;
     private string m_suffix;
@@ -61,6 +61,8 @@ public class EZ2ScreenshotWindow : EditorWindow
 
     // window settings
     private Vector2 m_scroll;
+
+    #region Advanced Mode
 
     // advanced mode
     private enum ETimeType
@@ -79,26 +81,28 @@ public class EZ2ScreenshotWindow : EditorWindow
     // time
     private ETimeType m_timeType;
     private string m_timeFormat;
-    private string m_timeSeparator = "-";
-    private bool m_useZerofillTime = true;
-    private bool m_useSeconds = true;
+    private string m_timeSeparator;
+    private bool m_useZerofillTime;
+    private bool m_useSeconds;
 
     // date
     private EDateType m_dateType;
     private string m_dateFormat;
-    private string m_dateSeparator = "-";
-    private bool m_useZerofillDate = true;
-    private bool m_useTwoDigitYear = true;
+    private string m_dateSeparator;
+    private bool m_useZerofillDate;
+    private bool m_useTwoDigitYear;
 
     // index
-    private int m_incrementalValue = 1;
-    private int m_minDigits = 4;
+    private int m_incrementalValue;
+    private int m_minDigits;
 
     // foldout
     private bool m_showFormatGuide;
     private bool m_showDateSettings;
     private bool m_showTimeSettings;
     private bool m_showIndexSettings;
+
+    #endregion
 
 
     [MenuItem("Window/JB Studio/EZ2Screenshot")]
@@ -110,7 +114,7 @@ public class EZ2ScreenshotWindow : EditorWindow
 
     private void Awake()
     {
-        m_path = Path.GetDirectoryName(Application.dataPath);
+        GetEditorPrefs();
     }
 
     private void OnGUI()
@@ -242,6 +246,7 @@ public class EZ2ScreenshotWindow : EditorWindow
 
     private void SetPathOnGUI()
     {
+        EditorGUI.BeginChangeCheck();
         GUILayout.Space(10f);
         GUILayout.Label(GetLocalizedString("gui_save_path_title"), EditorStyles.boldLabel);
         GUILayout.Label(
@@ -295,6 +300,13 @@ public class EZ2ScreenshotWindow : EditorWindow
 
         m_createSubfolder = EditorGUILayout.Toggle(GetLocalizedString("gui_create_subfolder"), m_createSubfolder);
         m_subfolderName = m_createSubfolder ? EditorGUILayout.TextField(GetLocalizedString("gui_subfolder_name"), m_subfolderName) : "";
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorPrefs.SetString("SavePath", m_path);
+            EditorPrefs.SetBool("CreateSubfolder", m_createSubfolder);
+            EditorPrefs.SetString("SubfolderName", m_subfolderName);
+        }
     }
 
     private void SetFileNameOnGUI()
@@ -302,9 +314,16 @@ public class EZ2ScreenshotWindow : EditorWindow
         GUILayout.Space(10f);
         GUILayout.Label(GetLocalizedString("gui_file_name_title"), EditorStyles.boldLabel);
 
+        EditorGUI.BeginChangeCheck();
         m_isAdvancedMode = EditorGUILayout.Toggle(GetLocalizedString("gui_advanced_mode"), m_isAdvancedMode);
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorPrefs.SetBool("IsAdvancedMode", m_isAdvancedMode);
+        }
+
         if (m_isAdvancedMode)
         {
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.HelpBox($"{GetLocalizedString("gui_final_file_name")}: <b>{ConvertPrefixSuffixFormat(m_fileName)}.{m_currentEFileFormat.ToString().ToLower()}</b>",
                 MessageType.Info);
             m_fileName = EditorGUILayout.TextField(GetLocalizedString("gui_file_name"), m_fileName);
@@ -407,9 +426,29 @@ public class EZ2ScreenshotWindow : EditorWindow
             {
                 m_timeFormat += $"{m_timeSeparator}{sec}";
             }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorPrefs.SetString("FileName", m_fileName);
+                EditorPrefs.SetInt("Index", m_screenshotIdx);
+
+                EditorPrefs.SetInt("TimeType", (int) m_timeType);
+                EditorPrefs.SetString("TimeSeparator", m_timeSeparator);
+                EditorPrefs.SetBool("UseZerofillTime", m_useZerofillTime);
+                EditorPrefs.SetBool("UseSeconds", m_useSeconds);
+
+                EditorPrefs.SetInt("DateType", (int) m_dateType);
+                EditorPrefs.SetString("DateSeparator", m_dateSeparator);
+                EditorPrefs.SetBool("UseZerofillDate", m_useZerofillDate);
+                EditorPrefs.SetBool("UseTwoDigitYear", m_useTwoDigitYear);
+
+                EditorPrefs.SetInt("IncrementalValue", m_incrementalValue);
+                EditorPrefs.SetInt("MinDigits", m_minDigits);
+            }
         }
         else
         {
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.HelpBox(
                 $"{GetLocalizedString("gui_final_file_name")}: <color=yellow>{m_prefix}</color>{m_fileName}<color=yellow>{m_suffix}{m_screenshotIdx:D4}</color>.{m_currentEFileFormat.ToString().ToLower()}",
                 MessageType.Info);
@@ -463,11 +502,20 @@ public class EZ2ScreenshotWindow : EditorWindow
             m_prefix = m_currentPrefixFormat == EPrefixSuffixFormat.None ? m_prefix : $"{m_prefix}{m_currentSeparator}";
             m_suffix = ConvertPrefixSuffixEnum(m_currentSuffixFormat);
             m_suffix = m_currentSuffixFormat == EPrefixSuffixFormat.None ? $"{m_suffix}{m_currentSeparator}" : $"{m_currentSeparator}{m_suffix}{m_currentSeparator}";
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorPrefs.SetString("FileName", m_fileName);
+                EditorPrefs.SetInt("Index", m_screenshotIdx);
+                EditorPrefs.SetInt("PrefixFormat", (int) m_currentPrefixFormat);
+                EditorPrefs.SetInt("SuffixFormat", (int) m_currentSuffixFormat);
+                EditorPrefs.SetInt("SelectedSeparator", (int) m_selectedSeparator);
+            }
         }
     }
 
     private void SetMiscellaneousOnGUI()
     {
+        EditorGUI.BeginChangeCheck();
         GUILayout.Space(10f);
         GUILayout.Label(GetLocalizedString("gui_miscellaneous"), EditorStyles.boldLabel);
         m_currentEFileFormat = (EFileFormat) EditorGUILayout.EnumPopup(GetLocalizedString("gui_format"), m_currentEFileFormat);
@@ -489,6 +537,18 @@ public class EZ2ScreenshotWindow : EditorWindow
             default:
                 Debug.Assert(false, m_currentECaptureMode);
                 break;
+        }
+        
+        if (GUILayout.Button(GetLocalizedString("gui_reset_all_settings")))
+        {
+            SetEditorPrefsToDefaultValues();
+            GetEditorPrefs();
+        }
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorPrefs.SetInt("CaptureMode", (int) m_currentECaptureMode);
+            EditorPrefs.SetInt("FileFormat", (int) m_currentEFileFormat);
         }
     }
 
@@ -585,11 +645,13 @@ public class EZ2ScreenshotWindow : EditorWindow
         {
             m_helper.fileName = $"{ConvertPrefixSuffixFormat(m_fileName)}";
             m_screenshotIdx += m_incrementalValue;
+            EditorPrefs.SetInt("Index", m_screenshotIdx);
         }
         else
         {
             m_helper.fileName = $"{m_prefix}{m_fileName}{m_suffix}{m_screenshotIdx:D4}";
             m_screenshotIdx++;
+            EditorPrefs.SetInt("Index", m_screenshotIdx);
         }
 
         m_helper.fileFormat = m_currentEFileFormat.ToString().ToLower();
@@ -603,5 +665,65 @@ public class EZ2ScreenshotWindow : EditorWindow
                 m_helper.CaptureWithoutUI();
                 break;
         }
+    }
+
+    private void GetEditorPrefs()
+    {
+        m_currentECaptureMode = (ECaptureMode) EditorPrefs.GetInt("CaptureMode", 0);
+        m_currentEFileFormat = (EFileFormat) EditorPrefs.GetInt("FileFormat", 0);
+        m_currentPrefixFormat = (EPrefixSuffixFormat) EditorPrefs.GetInt("PrefixFormat", 0);
+        m_currentSuffixFormat = (EPrefixSuffixFormat) EditorPrefs.GetInt("SuffixFormat", 0);
+        m_selectedSeparator = EditorPrefs.GetInt("SelectedSeparator", 0);
+
+        m_path = EditorPrefs.GetString("SavePath", Path.GetDirectoryName(Application.dataPath));
+        m_createSubfolder = EditorPrefs.GetBool("CreateSubfolder", false);
+        m_subfolderName = EditorPrefs.GetString("SubfolderName", "MyScreenshot");
+
+        m_isAdvancedMode = EditorPrefs.GetBool("IsAdvancedMode", false);
+        m_fileName = EditorPrefs.GetString("FileName", "screenshot");
+        m_screenshotIdx = EditorPrefs.GetInt("Index", 0);
+
+        m_timeType = (ETimeType) EditorPrefs.GetInt("TimeType", 0);
+        m_timeSeparator = EditorPrefs.GetString("TimeSeparator", "-");
+        m_useZerofillTime = EditorPrefs.GetBool("UseZerofillTime", true);
+        m_useSeconds = EditorPrefs.GetBool("UseSeconds", true);
+
+        m_dateType = (EDateType) EditorPrefs.GetInt("DateType", 0);
+        m_dateSeparator = EditorPrefs.GetString("DateSeparator", "-");
+        m_useZerofillDate = EditorPrefs.GetBool("UseZerofillDate", true);
+        m_useTwoDigitYear = EditorPrefs.GetBool("UseTwoDigitYear", true);
+
+        m_incrementalValue = EditorPrefs.GetInt("IncrementalValue", 1);
+        m_minDigits = EditorPrefs.GetInt("MinDigits", 4);
+    }
+
+    private void SetEditorPrefsToDefaultValues()
+    {
+        EditorPrefs.SetInt("CaptureMode", 0);
+        EditorPrefs.SetInt("FileFormat", 0);
+        EditorPrefs.SetInt("PrefixFormat", 0);
+        EditorPrefs.SetInt("SuffixFormat", 0);
+        EditorPrefs.SetInt("SelectedSeparator", 0);
+
+        EditorPrefs.SetString("SavePath", Path.GetDirectoryName(Application.dataPath));
+        EditorPrefs.SetBool("CreateSubfolder", false);
+        EditorPrefs.SetString("SubfolderName", "MyScreenshot");
+
+        EditorPrefs.SetBool("IsAdvancedMode", false);
+        EditorPrefs.SetString("FileName", "screenshot");
+        EditorPrefs.SetInt("Index", 0);
+
+        EditorPrefs.SetInt("TimeType", 0);
+        EditorPrefs.SetString("TimeSeparator", "-");
+        EditorPrefs.SetBool("UseZerofillTime", true);
+        EditorPrefs.SetBool("UseSeconds", true);
+
+        EditorPrefs.SetInt("DateType", 0);
+        EditorPrefs.SetString("DateSeparator", "-");
+        EditorPrefs.SetBool("UseZerofillDate", true);
+        EditorPrefs.SetBool("UseTwoDigitYear", true);
+
+        EditorPrefs.SetInt("IncrementalValue", 1);
+        EditorPrefs.SetInt("MinDigits", 4);
     }
 }

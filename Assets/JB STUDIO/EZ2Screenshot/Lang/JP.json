@@ -31,6 +31,7 @@
   "gui_miscellaneous": "その他の設定",
   "gui_format": "フォーマット",
   "gui_capture_mode": "キャプチャモード",
+  "gui_reset_all_settings": "すべての設定を初期化する",
   "gui_advanced_guide_title": "詳細モードフォーマットガイド",
   "gui_advanced_guide_date": "日付",
   "gui_advanced_guide_time": "時間",
