@@ -118,7 +118,7 @@ public class EZ2ScreenshotWindow : EditorWindow
         // Set helper object
         if (Camera.main == null)
         {
-            Debug.LogError("There is no main camera.");
+            Debug.LogError(GetLocalizedString("log_error_main_cam_not_exit"));
             return;
         }
 
@@ -229,9 +229,15 @@ public class EZ2ScreenshotWindow : EditorWindow
         {
             "English",
             "한국어",
+            "日本語"
         };
         EZ2ScreenshotLocalizer.CurrentLang =
             (EZ2ScreenshotLocalizer.EZ2ScreenshotLang) EditorGUILayout.Popup(GetLocalizedString("gui_language_yours"), (int) EZ2ScreenshotLocalizer.CurrentLang, displayedLanguage);
+
+        if (EZ2ScreenshotLocalizer.CurrentLang == EZ2ScreenshotLocalizer.EZ2ScreenshotLang.Japanese)
+        {
+            GUILayout.Label("翻訳: Ryu Siyeong", EditorStyles.boldLabel);
+        }
     }
 
     private void SetPathOnGUI()

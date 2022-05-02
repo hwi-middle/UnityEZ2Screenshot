@@ -9,7 +9,8 @@ public static class EZ2ScreenshotLocalizer
     public enum EZ2ScreenshotLang
     {
         English,
-        Korean
+        Korean,
+        Japanese,
     }
 
     private static EZ2ScreenshotLang _currentLang;
@@ -44,6 +45,9 @@ public static class EZ2ScreenshotLocalizer
                 break;
             case EZ2ScreenshotLang.Korean:
                 fileName = "KR";
+                break;
+            case EZ2ScreenshotLang.Japanese:
+                fileName = "JP";
                 break;
             default:
                 Debug.Assert(false, CurrentLang);
