@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -62,3 +63,4 @@ public static class EZ2ScreenshotLocalizer
         _data = JsonSerializer.Deserialize<Dictionary<string, string>>(file);
     }
 }
+#endif
