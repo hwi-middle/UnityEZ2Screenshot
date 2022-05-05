@@ -634,7 +634,7 @@ public class EZ2ScreenshotWindow : EditorWindow
             return;
         }
 
-        m_helper = Camera.main.gameObject.GetOrAddComponent<EZ2ScreenshotObject>();
+        m_helper = Camera.main.gameObject.JB_GetOrAddComponent<EZ2ScreenshotObject>();
         m_helper.path = $"{(m_createSubfolder ? m_path + "\\" + m_subfolderName : m_path)}";
         if (m_isAdvancedMode)
         {

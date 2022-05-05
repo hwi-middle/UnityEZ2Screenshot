@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class EZ2ScreenshotGameObjectExtension
 {
-    public static T GetOrAddComponent<T>(this GameObject go) where T : Component
+    public static T JB_GetOrAddComponent<T>(this GameObject go) where T : Component
     {
         T component = go.GetComponent<T>();
         
