@@ -1,9 +1,12 @@
+🙌 [이 문서는 한국어로도 읽을 수 있습니다.](README_KR.md)
+
 ![image](https://user-images.githubusercontent.com/18626148/166096262-8f22b2d9-5566-4d87-844a-9db006e64b0a.png)
 # EZ2Screenshot
 EZ2Screenshot is a simple screenshot solution for Unity. It supports Built-in, URP, and HDRP.
 
 ## Requirements
-- Unity 2021.2.0f1 or higher
+- Default: Unity 2021.2.0f1 or higher
+- With [Extra DLLs Package](https://github.com/hwi-middle/UnityEZ2Screenshot/issues/2): Unity 2018.3.0f1 or higher
 
 ## Simple tutorial
 
