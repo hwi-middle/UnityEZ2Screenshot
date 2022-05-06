@@ -1,6 +1,7 @@
+![image](https://user-images.githubusercontent.com/18626148/166096262-8f22b2d9-5566-4d87-844a-9db006e64b0a.png)
+## 한국어 지원
 🙌 [이 문서는 한국어로도 읽을 수 있습니다.](README_KR.md)
 
-![image](https://user-images.githubusercontent.com/18626148/166096262-8f22b2d9-5566-4d87-844a-9db006e64b0a.png)
 # EZ2Screenshot
 EZ2Screenshot is a simple screenshot solution for Unity. It supports Built-in, URP, and HDRP.
 
